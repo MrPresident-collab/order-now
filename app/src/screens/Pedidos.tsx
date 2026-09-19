@@ -42,6 +42,16 @@ export function Pedidos() {
   const history = orders.filter((o) => ['DELIVERED', 'CANCELLED', 'delivered', 'entregue'].includes(o.status));
   const shown = tab === 'ativo' ? active : history;
 
+  const statusLabel = (status: string) => {
+    const s = status.toUpperCase();
+    if (s.includes('CANCEL')) return 'Cancelado';
+    if (s.includes('DELIVER')) return 'Entregue';
+    if (s.includes('TRANSIT') || s.includes('WAY') || s.includes('PICK')) return 'A caminho';
+    if (s.includes('PREP')) return 'A preparar';
+    if (s.includes('ACCEPT')) return 'Aceite';
+    return 'Recebido';
+  };
+
   const statusIcon = (status: string) => {
     if (status === 'DELIVERED' || status === 'entregue') return <CheckCircle className="w-4 h-4 text-success-500" />;
     if (status === 'CANCELLED') return <Clock className="w-4 h-4 text-gray-400" />;
@@ -110,13 +120,13 @@ export function Pedidos() {
             <div className="flex items-start justify-between mb-2">
               <div>
                 <h3 className="font-bold text-gray-900 dark:text-white text-sm">{order.businessName}</h3>
-                <p className="text-xs text-gray-400 mt-0.5">{order.orderReference} · {fmtDate(order.placedAt)}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{order.orderReference}{fmtDate(order.placedAt) ? ` · ${fmtDate(order.placedAt)}` : ''}</p>
               </div>
               <span className="font-extrabold text-gray-900 dark:text-white text-sm">{formatKz(order.totalAmount)}</span>
             </div>
             <div className={`flex items-center gap-1.5 mt-2 ${statusColor(order.status)}`}>
               {statusIcon(order.status)}
-              <span className="text-xs font-semibold">{order.status}{order.riderName ? ` · ${order.riderName}` : ''}</span>
+              <span className="text-xs font-semibold">{statusLabel(order.status)}{order.riderName ? ` · ${order.riderName}` : ''}</span>
             </div>
           </button>
         ))}
