@@ -17,9 +17,9 @@ export function BottomNav({ current }: { current: ScreenName }) {
         {tabs.map(({ id, label, icon: Icon }) => {
           const active = current === id;
           return (
-            <button key={id} onClick={() => navigate(id)} className="flex-1 flex flex-col items-center gap-1 py-3 transition-colors active:scale-90">
+            <button key={id} onClick={() => navigate(id)} className="flex-1 flex flex-col items-center gap-1 py-2.5 transition-colors active:scale-90">
               <Icon className={active ? 'w-6 h-6 text-[#8A2BE2] drop-shadow-[0_0_8px_rgba(138,43,226,0.35)]' : 'w-6 h-6 text-gray-500'} strokeWidth={active ? 2.5 : 2} />
-              <span className={active ? 'text-xs font-medium text-[#8A2BE2]' : 'text-xs font-medium text-gray-500'}>{label}</span>
+              <span className={active ? 'text-[11px] font-bold text-[#8A2BE2]' : 'text-[11px] font-medium text-gray-500'}>{label}</span>
             </button>
           );
         })}
