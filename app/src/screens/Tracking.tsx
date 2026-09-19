@@ -36,12 +36,12 @@ export function Tracking() {
   }, [selectedOrderId]);
 
   const status = (detail?.status ?? '').toUpperCase();
-  const orderIdx = status.includes('DELIVER') ? 3 : status.includes('PICK') || status.includes('TRANSIT') || status.includes('WAY') ? 2 : status.includes('PREP') || status.includes('ACCEPT') ? 1 : 0;
+  const orderIdx = status.includes('DELIVER') ? 4 : status.includes('TRANSIT') || status.includes('WAY') ? 3 : status.includes('PICK') ? 2 : status.includes('READY') || status.includes('PREP') ? 2 : status.includes('ACCEPT') ? 1 : 0;
   const labels = ['Recebido', 'Aceite', 'A preparar', 'Estafeta a caminho', 'Entregue'];
 
   const riderPhone = detail?.delivery?.riderPhone ?? null;
   const callRider = () => { if (riderPhone) window.location.href = `tel:${riderPhone}`; };
-  const messageRider = () => { if (riderPhone) window.location.href = `https://wa.me/${riderPhone.replace(/\\D/g, '')}`; };
+  const messageRider = () => { if (riderPhone) window.location.href = `https://wa.me/${riderPhone.replace(/\D/g, '')}`; };
   const shareOrder = async () => { if (navigator.share) await navigator.share({ title: `Pedido ${detail?.orderReference ?? ''}`, text: 'Acompanhar o meu pedido Pedejá.' }); else await navigator.clipboard?.writeText(window.location.href); };
 
   return (
