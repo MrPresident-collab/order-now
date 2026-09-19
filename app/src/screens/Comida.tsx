@@ -53,7 +53,7 @@ export function Comida() {
         {!loading && !error && filtered.map((b) => <button key={b.id} onClick={() => { setSelectedRestaurantId(b.id); navigate('restaurant'); }} className="w-full bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm text-left"><div className="flex items-start justify-between gap-3"><div><h3 className="font-bold text-sm">{b.name}</h3><p className="text-xs text-gray-500 mt-1">{b.description || 'Negócio de alimentação'}</p></div><span className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full">comida</span></div></button>)}
         {!loading && !error && filtered.length === 0 && <EmptyView title="Nenhum negócio de comida" hint="Ainda não há negócios de comida publicados." />}
       </div>
-      <BottomNav current="comida" />
+      <BottomNav current="discover" />
     </div>
   );
 }
