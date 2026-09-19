@@ -13,8 +13,8 @@ export function About() {
   ];
 
   const contact = [
-    { icon: Mail, label: 'Email', value: 'suporte@pedeja.ao' },
-    { icon: Phone, label: 'Telefone', value: '+244 932 000 000' },
+    { icon: Mail, label: 'Email', value: 'Contacto será publicado pela Pedejá antes do lançamento' },
+    { icon: Phone, label: 'Telefone', value: 'Contacto será publicado pela Pedejá antes do lançamento' },
   ];
 
   return (
