@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNav } from '@/nav';
 import { useAuth } from '@/auth';
-import { getEnviarTracking, subscribeToEnviarTracking, type EnviarTracking } from '@/repositories/enviar';
+import { createCustomerEnviarShipment, getEnviarTracking, subscribeToEnviarTracking, type EnviarTracking } from '@/repositories/enviar';
+import { getDefaultCustomerAddress, type CustomerAddress } from '@/repositories/addresses';
 import { ChevronLeft, MapPin, Package, FileText, Box, HelpCircle, Bike } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LoadingView, ErrorView } from '@/components/StateViews';
@@ -14,6 +15,16 @@ export function Enviar() {
   const [destination, setDestination] = useState('');
   const [instructions, setInstructions] = useState('');
   const [tracking, setTracking] = useState<EnviarTracking | null>(null);
+  const [pickupAddress, setPickupAddress] = useState<CustomerAddress | null>(null);
+  const [recipientName, setRecipientName] = useState('');
+  const [recipientPhone, setRecipientPhone] = useState('+244 ');
+  const [recipientCity, setRecipientCity] = useState('Luanda');
+  const [recipientProvince, setRecipientProvince] = useState('Luanda');
+  const [packageDescription, setPackageDescription] = useState('');
+  const [packageSize, setPackageSize] = useState('');
+  const [fragile, setFragile] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
   const [trackLoading, setTrackLoading] = useState(false);
   const [trackError, setTrackError] = useState<string | null>(null);
   const [shipmentInput, setShipmentInput] = useState(selectedShipmentId ?? '');
@@ -36,6 +47,50 @@ export function Enviar() {
       })
       .catch((e: Error) => setTrackError(e.message))
       .finally(() => setTrackLoading(false));
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    getDefaultCustomerAddress().then(setPickupAddress).catch(() => setPickupAddress(null));
+  }, [user]);
+
+  const createShipment = async () => {
+    setCreateError(null);
+    if (!user) return setCreateError('Entra na conta para criar um envio.');
+    if (!pickupAddress) return setCreateError('Adiciona uma morada de recolha antes de continuar.');
+    if (!recipientName.trim() || recipientName.trim().length < 2) return setCreateError('Indica o nome de quem vai receber.');
+    if (recipientPhone.replace(/\\D/g, '').length < 9) return setCreateError('Indica um telefone válido para o destinatário.');
+    if (!destination.trim() || destination.trim().length < 2) return setCreateError('Indica a morada de destino.');
+    if (!packageDescription.trim()) return setCreateError('Descreve brevemente o que vais enviar.');
+    setCreating(true);
+    try {
+      // Until a proper destination map/geocoder is connected, require the user to provide
+      // destination coordinates rather than silently using the phone's current location.
+      if (!('geolocation' in navigator)) throw new Error('A localização do destino é necessária para calcular o envio.');
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000, enableHighAccuracy: true }));
+      const shipmentId = await createCustomerEnviarShipment({
+        pickupAddressId: pickupAddress.addressId,
+        recipientName,
+        recipientPhone,
+        recipientAddressLine1: destination,
+        recipientCity,
+        recipientProvince,
+        recipientLatitude: position.coords.latitude,
+        recipientLongitude: position.coords.longitude,
+        packageDescription,
+        packageSize,
+        isFragile: fragile,
+        customerNote: instructions,
+      });
+      setSelectedShipmentId(shipmentId);
+      setShipmentInput(shipmentId);
+      setCreateError(null);
+      trackShipment(shipmentId);
+    } catch (e) {
+      setCreateError(e instanceof Error ? e.message : 'Não foi possível criar o envio.');
+    } finally {
+      setCreating(false);
+    }
   };
 
   useEffect(() => {
@@ -87,13 +142,17 @@ export function Enviar() {
 
       {type && (
         <div className="px-5 pt-6 animate-fade-in">
-          <h2 className="text-sm font-bold text-gray-900 dark:text-white mb-3">De onde?</h2>
-          <input
-            value={pickup}
-            onChange={(e) => setPickup(e.target.value)}
-            placeholder="Morada de recolha"
-            className="w-full bg-white dark:bg-gray-900 rounded-2xl p-4 text-sm shadow-sm outline-none"
-          />
+          <h2 className="text-sm font-bold text-gray-900 dark:text-white mb-3">Recolha</h2>
+          <div className="rounded-2xl bg-white dark:bg-gray-900 p-4 shadow-sm">
+            <p className="text-sm font-bold text-gray-900 dark:text-white">{pickupAddress?.label ?? 'Sem morada'}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{pickupAddress?.addressLine1 ?? 'Adiciona uma morada de recolha no Perfil.'}</p>
+            {!pickupAddress && <button onClick={() => navigate('address')} className="mt-2 text-xs font-bold text-pedeja-600">Adicionar morada</button>}
+          </div>
+          <h2 className="text-sm font-bold text-gray-900 dark:text-white mb-3 mt-5">Quem recebe?</h2>
+          <div className="grid grid-cols-2 gap-3">
+            <input value={recipientName} onChange={(e) => setRecipientName(e.target.value)} placeholder="Nome" className="bg-white dark:bg-gray-900 rounded-2xl p-4 text-sm shadow-sm outline-none" />
+            <input value={recipientPhone} onChange={(e) => setRecipientPhone(e.target.value)} placeholder="Telefone" className="bg-white dark:bg-gray-900 rounded-2xl p-4 text-sm shadow-sm outline-none" />
+          </div>
           <h2 className="text-sm font-bold text-gray-900 dark:text-white mb-3 mt-5">Para onde?</h2>
           <input
             value={destination}
@@ -101,6 +160,17 @@ export function Enviar() {
             placeholder="Morada de destino"
             className="w-full bg-white dark:bg-gray-900 rounded-2xl p-4 text-sm shadow-sm outline-none"
           />
+          <div className="grid grid-cols-2 gap-3 mt-3">
+            <input value={recipientCity} onChange={(e) => setRecipientCity(e.target.value)} placeholder="Cidade" className="bg-white dark:bg-gray-900 rounded-2xl p-4 text-sm shadow-sm outline-none" />
+            <input value={recipientProvince} onChange={(e) => setRecipientProvince(e.target.value)} placeholder="Província" className="bg-white dark:bg-gray-900 rounded-2xl p-4 text-sm shadow-sm outline-none" />
+          </div>
+          <h2 className="text-sm font-bold text-gray-900 dark:text-white mb-3 mt-5">O que estás a enviar?</h2>
+          <input value={packageDescription} onChange={(e) => setPackageDescription(e.target.value)} placeholder="Ex: documentos, roupa, pequeno pacote" className="w-full bg-white dark:bg-gray-900 rounded-2xl p-4 text-sm shadow-sm outline-none" />
+          <input value={packageSize} onChange={(e) => setPackageSize(e.target.value)} placeholder="Tamanho / observação (opcional)" className="mt-3 w-full bg-white dark:bg-gray-900 rounded-2xl p-4 text-sm shadow-sm outline-none" />
+          <label className="mt-3 flex items-center gap-3 rounded-2xl bg-white dark:bg-gray-900 p-4 shadow-sm">
+            <input type="checkbox" checked={fragile} onChange={(e) => setFragile(e.target.checked)} className="accent-pedeja-600" />
+            <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">É frágil</span>
+          </label>
           <h2 className="text-sm font-bold text-gray-900 dark:text-white mb-3 mt-5">Instruções</h2>
           <input
             value={instructions}
@@ -108,11 +178,10 @@ export function Enviar() {
             placeholder="Detalhes do pacote"
             className="w-full bg-white dark:bg-gray-900 rounded-2xl p-4 text-sm shadow-sm outline-none"
           />
-          <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 dark:bg-amber-950/20 p-4">
-            <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">
-              Criação de Enviar ainda não ligada: o backend não expõe create_customer_enviar_shipment. Guarda estes dados e repete quando a RPC existir.
-            </p>
-          </div>
+          {createError && <div className="mt-4"><ErrorView message={createError} /></div>}
+          <button onClick={createShipment} disabled={creating} className="mt-4 w-full rounded-2xl bg-pedeja-600 py-4 text-sm font-bold text-white disabled:opacity-50">
+            {creating ? 'A criar envio...' : 'Criar envio'}
+          </button>
         </div>
       )}
 
