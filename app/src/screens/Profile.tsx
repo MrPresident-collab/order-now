@@ -47,7 +47,7 @@ export function Profile() {
         {
           icon: theme === 'light' ? Moon : Sun,
           label: theme === 'light' ? 'Modo escuro' : 'Modo claro',
-          sublabel: theme === 'light' ? 'Atapar para escuro' : 'Atapar para claro',
+          sublabel: theme === 'light' ? 'Mudar para escuro' : 'Mudar para claro',
           action: 'toggle-theme' as const,
         },
       ],
