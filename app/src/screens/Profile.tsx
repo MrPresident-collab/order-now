@@ -142,7 +142,7 @@ export function Profile() {
       {/* Legal */}
       <div className="px-5 pt-5">
         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden">
-          <button className="w-full flex items-center gap-3 p-4 active:bg-gray-50 dark:active:bg-gray-800 transition-colors text-left">
+          <button onClick={() => navigate('about')} className="w-full flex items-center gap-3 p-4 active:bg-gray-50 dark:active:bg-gray-800 transition-colors text-left">
             <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
               <Shield className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </div>
