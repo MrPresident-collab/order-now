@@ -3,7 +3,7 @@ import { useNav } from '@/nav';
 import { useAuth } from '@/auth';
 import { getCustomerOrderDetail, subscribeToOrder } from '@/repositories/orderDetail';
 import type { CustomerOrderDetail } from '@/repositories/orderDetail';
-import { ChevronLeft, Phone, MessageCircle, MapPin, Bike, Star } from 'lucide-react';
+import { ChevronLeft, Phone, MessageCircle, MapPin, Bike, Star, Share2 } from 'lucide-react';
 import { LoadingView, ErrorView, EmptyView } from '@/components/StateViews';
 
 export function Tracking() {
@@ -37,7 +37,12 @@ export function Tracking() {
 
   const status = (detail?.status ?? '').toUpperCase();
   const orderIdx = status.includes('DELIVER') ? 3 : status.includes('PICK') || status.includes('TRANSIT') || status.includes('WAY') ? 2 : status.includes('PREP') || status.includes('ACCEPT') ? 1 : 0;
-  const labels = ['Recebido', 'Preparando', 'Estafeta a caminho', 'Entregue'];
+  const labels = ['Recebido', 'Aceite', 'A preparar', 'Estafeta a caminho', 'Entregue'];
+
+  const riderPhone = detail?.delivery?.riderPhone ?? null;
+  const callRider = () => { if (riderPhone) window.location.href = `tel:${riderPhone}`; };
+  const messageRider = () => { if (riderPhone) window.location.href = `https://wa.me/${riderPhone.replace(/\\D/g, '')}`; };
+  const shareOrder = async () => { if (navigator.share) await navigator.share({ title: `Pedido ${detail?.orderReference ?? ''}`, text: 'Acompanhar o meu pedido Pedejá.' }); else await navigator.clipboard?.writeText(window.location.href); };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col">
@@ -120,10 +125,11 @@ export function Tracking() {
                   </span>
                 </div>
               </div>
-              <button className="w-10 h-10 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center"><Phone className="w-5 h-5 text-pedeja-600" /></button>
-              <button className="w-10 h-10 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center"><MessageCircle className="w-5 h-5 text-pedeja-600" /></button>
+              <button onClick={callRider} disabled={!riderPhone} aria-label="Ligar ao estafeta" className="w-10 h-10 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center disabled:opacity-40"><Phone className="w-5 h-5 text-pedeja-600" /></button>
+              <button onClick={messageRider} disabled={!riderPhone} aria-label="Enviar mensagem ao estafeta" className="w-10 h-10 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center disabled:opacity-40"><MessageCircle className="w-5 h-5 text-pedeja-600" /></button>
             </div>
-            <button onClick={() => navigate('profile')} className="w-full text-center text-sm text-gray-500 dark:text-gray-400 font-medium mt-4 py-2">
+            <button onClick={shareOrder} className="mt-3 w-full flex items-center justify-center gap-2 text-sm text-pedeja-600 font-semibold py-2"><Share2 className="w-4 h-4" /> Partilhar pedido</button>
+            <button onClick={() => navigate('help')} className="w-full text-center text-sm text-gray-500 dark:text-gray-400 font-medium mt-4 py-2">
               Precisas de ajuda? <span className="text-pedeja-600 font-semibold">Conversar com suporte</span>
             </button>
           </>
