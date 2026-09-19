@@ -11,7 +11,6 @@ export function Enviar() {
   const { goBack, navigate, selectedShipmentId, setSelectedShipmentId } = useNav();
   const { user } = useAuth();
   const [type, setType] = useState<string | null>(null);
-  const [pickup, setPickup] = useState('');
   const [destination, setDestination] = useState('');
   const [instructions, setInstructions] = useState('');
   const [tracking, setTracking] = useState<EnviarTracking | null>(null);
@@ -225,9 +224,7 @@ export function Enviar() {
               Viatura: {[tracking.vehicleMake, tracking.vehicleModel, tracking.vehicleRegistration].filter(Boolean).join(' ') || '—'}
             </p>
             {tracking.distanceKm != null && <p className="text-gray-500">Distância: {tracking.distanceKm} km</p>}
-            <button onClick={() => navigate('tracking')} className="mt-2 flex items-center gap-2 text-pedeja-600 font-bold text-xs">
-              <MapPin className="w-4 h-4" /> Abrir acompanhamento
-            </button>
+            <p className="mt-2 text-xs text-pedeja-600 font-bold">O acompanhamento actualiza automaticamente quando o backend emitir novos estados.</p>
           </div>
         )}
       </div>
