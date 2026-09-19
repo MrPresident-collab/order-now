@@ -3,16 +3,16 @@ import { useNav } from '@/nav';
 import { useAuth } from '@/auth';
 import { listActiveBusinesses, type CatalogBusiness } from '@/repositories/catalog';
 import { getDefaultCustomerAddress, type CustomerAddress } from '@/repositories/addresses';
-import { User, ChevronDown, UtensilsCrossed, ShoppingBag, Send, Store } from 'lucide-react';
+import { User, ChevronDown } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LoadingView, ErrorView, EmptyView, BackendBlockedView } from '@/components/StateViews';
 
 const categoryCards = [
-  { label: 'COMIDA', screen: 'comida' as const, icon: UtensilsCrossed },
-  { label: 'COMPRAS', screen: 'compras' as const, icon: ShoppingBag },
-  { label: 'ENVIAR', screen: 'enviar' as const, icon: Send },
-  { label: 'LOJAS', screen: 'lojas' as const, icon: Store },
+  { label: 'COMIDA', screen: 'comida' as const, image: '/category-comida.svg' },
+  { label: 'COMPRAS', screen: 'compras' as const, image: '/category-compras.svg' },
+  { label: 'ENVIAR', screen: 'enviar' as const, image: '/category-enviar.svg' },
+  { label: 'LOJAS', screen: 'lojas' as const, image: '/category-lojas.svg' },
 ];
 
 export function Home() {
@@ -74,13 +74,21 @@ export function Home() {
         )}
       </div>
 
-      <div className="px-5 pt-5 grid grid-cols-2 gap-3">
-        {categoryCards.map(({ label, screen, icon: Icon }) => (
-          <button key={label} onClick={() => navigate(screen)} className="h-28 rounded-2xl bg-pedeja-950 text-white flex flex-col justify-end p-4 text-left active:scale-[0.97] transition-transform">
-            <Icon className="w-6 h-6 mb-3 opacity-90" />
-            <span className="font-bold text-sm tracking-wide">{label}</span>
-          </button>
-        ))}
+      <div className="px-5 pt-5">
+        <h2 className="text-base font-extrabold text-gray-900 dark:text-white mb-3">O que precisas hoje?</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {categoryCards.map(({ label, screen, image }) => (
+            <button
+              key={label}
+              onClick={() => navigate(screen)}
+              className="group relative aspect-[1.42] overflow-hidden rounded-2xl bg-[#1A1A1A] text-white text-left shadow-sm active:scale-[0.97] transition-transform"
+            >
+              <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-active:scale-105" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
+              <span className="absolute bottom-3 left-3 font-extrabold text-sm tracking-wide">{label}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="mt-6 px-5">
