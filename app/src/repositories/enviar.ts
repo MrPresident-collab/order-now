@@ -13,6 +13,57 @@ export type EnviarTracking = {
   distanceKm: number | null;
 };
 
+export async function createCustomerEnviarShipment(input: {
+  pickupAddressId: string;
+  recipientName: string;
+  recipientPhone: string;
+  recipientAddressLine1: string;
+  recipientAddressLine2?: string;
+  recipientNeighborhood?: string;
+  recipientMunicipality?: string;
+  recipientCity: string;
+  recipientProvince: string;
+  recipientLatitude: number;
+  recipientLongitude: number;
+  packageDescription: string;
+  packageWeightKg?: number | null;
+  packageSize?: string;
+  vehicleType?: string;
+  isFragile?: boolean;
+  customerNote?: string;
+}): Promise<string> {
+  const idempotencyKey = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+  const { data, error } = await supabase.rpc('create_customer_enviar_shipment', {
+    p_pickup_address_id: input.pickupAddressId,
+    p_recipient_name: input.recipientName.trim(),
+    p_recipient_phone: input.recipientPhone.trim(),
+    p_recipient_address_line_1: input.recipientAddressLine1.trim(),
+    p_recipient_address_line_2: input.recipientAddressLine2?.trim() ?? '',
+    p_recipient_neighborhood: input.recipientNeighborhood?.trim() ?? '',
+    p_recipient_municipality: input.recipientMunicipality?.trim() ?? '',
+    p_recipient_city: input.recipientCity.trim(),
+    p_recipient_province: input.recipientProvince.trim(),
+    p_recipient_latitude: input.recipientLatitude,
+    p_recipient_longitude: input.recipientLongitude,
+    p_package_description: input.packageDescription.trim(),
+    p_package_weight_kg: input.packageWeightKg ?? null,
+    p_package_size: input.packageSize ?? '',
+    p_vehicle_type: input.vehicleType ?? '',
+    p_is_fragile: input.isFragile ?? false,
+    p_customer_note: input.customerNote?.trim() ?? '',
+    p_idempotency_key: idempotencyKey,
+  });
+
+  if (error) throw new Error(error.code === '42501'
+    ? 'Sem permissão no backend (RLS). Inicia sessão e tenta novamente.'
+    : (error.message ?? 'Não foi possível criar o envio.'));
+  if (!data) throw new Error('ENVIAR_CREATION_FAILED');
+  return String(data);
+}
+
 export async function getEnviarTracking(shipmentId: string): Promise<EnviarTracking | null> {
   const { data, error } = await supabase.rpc('get_customer_enviar_tracking', { p_shipment_id: shipmentId });
   if (error) throw error;
