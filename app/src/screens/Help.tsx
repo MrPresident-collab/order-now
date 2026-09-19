@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNav } from '@/nav';
-import { ChevronLeft, Search, MessageCircle, Phone, Mail, FileText, ChevronRight } from 'lucide-react';
+import { ChevronLeft, Search, MessageCircle, FileText, ChevronRight } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 export function Help() {
@@ -19,9 +19,7 @@ export function Help() {
   const filtered = query === '' ? faqs : faqs.filter((f) => f.q.toLowerCase().includes(query.toLowerCase()));
 
   const channels = [
-    { icon: MessageCircle, label: 'Chat ao vivo', sublabel: 'Fala com a equipa Pedejá', color: 'text-pedeja-600' },
-    { icon: Phone, label: 'Telefone', sublabel: '+244 932 000 000', color: 'text-success-600' },
-    { icon: Mail, label: 'Email', sublabel: 'suporte@pedeja.ao', color: 'text-accent-600' },
+    { icon: MessageCircle, label: 'Suporte Pedejá', sublabel: 'Canal de atendimento será disponibilizado no lançamento', color: 'text-pedeja-600' },
   ];
 
   return (
