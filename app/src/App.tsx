@@ -7,6 +7,7 @@ import { Auth } from '@/screens/Auth';
 import { OTP } from '@/screens/OTP';
 import { Address } from '@/screens/Address';
 import { Home } from '@/screens/Home';
+import { Discover } from '@/screens/Discover';
 import { Comida } from '@/screens/Comida';
 import { Restaurant } from '@/screens/Restaurant';
 import { Compras } from '@/screens/Compras';
@@ -36,6 +37,7 @@ function ScreenRouter() {
     otp: <OTP />,
     address: <Address />,
     home: <Home />,
+    discover: <Discover />,
     comida: <Comida />,
     restaurant: <Restaurant />,
     compras: <Compras />,
@@ -56,11 +58,7 @@ function ScreenRouter() {
     'edit-profile': <EditProfile />,
   };
 
-  return (
-    <div key={screen} className="animate-fade-in">
-      {screens[screen]}
-    </div>
-  );
+  return <div key={screen} className="animate-fade-in">{screens[screen]}</div>;
 }
 
 function App() {
