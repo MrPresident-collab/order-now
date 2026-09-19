@@ -4,14 +4,13 @@ import { useAuth } from '@/auth';
 import { createCustomerOrder } from '@/repositories/orderCreate';
 import { getCustomerAddresses, type CustomerAddress } from '@/repositories/addresses';
 import { formatKz } from '@/data';
-import { ChevronLeft, Home } from 'lucide-react';
+import { ChevronLeft, Home, Check } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LoadingView, ErrorView } from '@/components/StateViews';
 
 export function Checkout() {
   const { goBack, navigate, cart, cartTotal, cartCount, cartRestaurantName, cartBusinessId, clearCart, setSelectedOrderId } = useNav();
   const { user } = useAuth();
-  const [payment, setPayment] = useState('dinheiro');
   const [note, setNote] = useState('');
   const [addresses, setAddresses] = useState<CustomerAddress[]>([]);
   const [addressId, setAddressId] = useState<string | null>(null);
@@ -65,7 +64,7 @@ export function Checkout() {
         businessId: cartBusinessId,
         deliveryAddressId: addressId,
         items: cart.map((c) => ({ productId: c.id, quantity: c.quantity })),
-        customerNote: note ? `${note} [pagamento: ${payment}]` : `[pagamento: ${payment}]`,
+        customerNote: note,
       });
       clearCart();
       setSelectedOrderId(orderId);
@@ -181,25 +180,23 @@ export function Checkout() {
 
       {/* Payment */}
       <div className="px-5 pt-5">
-        <h2 className="text-sm font-bold text-gray-900 dark:text-white mb-3">Pagamento (informativo)</h2>
-        <div className="grid grid-cols-2 gap-2">
-          {['dinheiro', 'multicaixa'].map((m) => (
-            <button
-              key={m}
-              onClick={() => setPayment(m)}
-              className={`rounded-2xl p-4 text-sm font-bold border-2 ${payment === m ? 'border-pedeja-600 bg-white dark:bg-gray-900' : 'border-transparent bg-white dark:bg-gray-900 text-gray-500'}`}
-            >
-              {m === 'dinheiro' ? 'Dinheiro' : 'Multicaixa'}
-            </button>
-          ))}
+        <h2 className="text-sm font-bold text-gray-900 dark:text-white mb-3">Pagamento</h2>
+        <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 flex items-center gap-3 shadow-sm border border-gray-100 dark:border-gray-800">
+          <div className="w-10 h-10 rounded-xl bg-pedeja-50 dark:bg-pedeja-950/50 flex items-center justify-center">
+            <span className="text-pedeja-600 font-extrabold text-xs">Kz</span>
+          </div>
+          <div className="flex-1">
+            <p className="font-bold text-gray-900 dark:text-white text-sm">Dinheiro</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Método disponível no fluxo actual.</p>
+          </div>
+          <Check className="w-5 h-5 text-pedeja-600" />
         </div>
-        <p className="text-xs text-gray-500 mt-2">O método final segue as regras do backend. Valor registado na nota do pedido.</p>
       </div>
 
       {submitError && <div className="px-5 pt-4"><ErrorView message={submitError} /></div>}
 
       {/* Sticky confirm */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-phone mx-auto px-5 pb-6 pt-4 bg-gradient-to-t from-gray-50 dark:from-gray-950 to-transparent safe-bottom z-40">
+      <div className="fixed bottom-0 left-0 right-0 max-w-phone mx-auto px-5 pb-6 pt-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 safe-bottom z-40">
         <button
           onClick={handleConfirm}
           disabled={submitting}
