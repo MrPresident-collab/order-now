@@ -68,7 +68,7 @@ function CategoryBusinesses({ category, emptyTitle, searchPlaceholder }: { categ
         ))}
         {!loading && !error && filtered.length === 0 && <EmptyView title={emptyTitle} hint="Ainda não há negócios publicados nesta categoria." />}
       </div>
-      <BottomNav current="comida" />
+      <BottomNav current="discover" />
     </div>
   );
 }
