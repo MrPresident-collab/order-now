@@ -20,6 +20,8 @@ export function Enviar() {
   const [recipientPhone, setRecipientPhone] = useState('+244 ');
   const [recipientCity, setRecipientCity] = useState('Luanda');
   const [recipientProvince, setRecipientProvince] = useState('Luanda');
+  const [recipientLatitude, setRecipientLatitude] = useState('');
+  const [recipientLongitude, setRecipientLongitude] = useState('');
   const [packageDescription, setPackageDescription] = useState('');
   const [packageSize, setPackageSize] = useState('');
   const [fragile, setFragile] = useState(false);
@@ -64,10 +66,11 @@ export function Enviar() {
     if (!packageDescription.trim()) return setCreateError('Descreve brevemente o que vais enviar.');
     setCreating(true);
     try {
-      // Until a proper destination map/geocoder is connected, require the user to provide
-      // destination coordinates rather than silently using the phone's current location.
-      if (!('geolocation' in navigator)) throw new Error('A localização do destino é necessária para calcular o envio.');
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000, enableHighAccuracy: true }));
+      const latitude = Number(recipientLatitude);
+      const longitude = Number(recipientLongitude);
+      if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 || !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+        throw new Error('Indica a localização do destinatário (latitude e longitude).');
+      }
       const shipmentId = await createCustomerEnviarShipment({
         pickupAddressId: pickupAddress.addressId,
         recipientName,
@@ -75,8 +78,8 @@ export function Enviar() {
         recipientAddressLine1: destination,
         recipientCity,
         recipientProvince,
-        recipientLatitude: position.coords.latitude,
-        recipientLongitude: position.coords.longitude,
+        recipientLatitude: latitude,
+        recipientLongitude: longitude,
         packageDescription,
         packageSize,
         isFragile: fragile,
@@ -163,6 +166,14 @@ export function Enviar() {
           <div className="grid grid-cols-2 gap-3 mt-3">
             <input value={recipientCity} onChange={(e) => setRecipientCity(e.target.value)} placeholder="Cidade" className="bg-white dark:bg-gray-900 rounded-2xl p-4 text-sm shadow-sm outline-none" />
             <input value={recipientProvince} onChange={(e) => setRecipientProvince(e.target.value)} placeholder="Província" className="bg-white dark:bg-gray-900 rounded-2xl p-4 text-sm shadow-sm outline-none" />
+          </div>
+          <div className="mt-3 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+            <p className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Localização do destino</p>
+            <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-3">Obrigatória para o backend calcular a distância. Nesta versão, introduz as coordenadas do destino; o seletor de mapa será ligado depois.</p>
+            <div className="grid grid-cols-2 gap-3">
+              <input value={recipientLatitude} onChange={(e) => setRecipientLatitude(e.target.value)} inputMode="decimal" placeholder="Latitude" className="bg-gray-50 dark:bg-gray-950 rounded-xl p-3 text-sm outline-none" />
+              <input value={recipientLongitude} onChange={(e) => setRecipientLongitude(e.target.value)} inputMode="decimal" placeholder="Longitude" className="bg-gray-50 dark:bg-gray-950 rounded-xl p-3 text-sm outline-none" />
+            </div>
           </div>
           <h2 className="text-sm font-bold text-gray-900 dark:text-white mb-3 mt-5">O que estás a enviar?</h2>
           <input value={packageDescription} onChange={(e) => setPackageDescription(e.target.value)} placeholder="Ex: documentos, roupa, pequeno pacote" className="w-full bg-white dark:bg-gray-900 rounded-2xl p-4 text-sm shadow-sm outline-none" />
