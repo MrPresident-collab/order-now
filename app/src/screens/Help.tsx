@@ -10,9 +10,9 @@ export function Help() {
   const faqs = [
     { q: 'Como faço um pedido?', a: 'Escolhe um negócio no catálogo, adiciona produtos ao carrinho e cria o pedido real no Checkout.' },
     { q: 'Quanto tempo demora a entrega?', a: 'O estado e o estafeta aparecem no acompanhamento do pedido em tempo real.' },
-    { q: 'Como pago o meu pedido?', a: 'O pagamento segue as regras do backend. O Checkout regista a tua preferência na nota do pedido.' },
+    { q: 'Como pago o meu pedido?', a: 'O Checkout mostra apenas o fluxo de pagamento suportado pelo backend. A app não inventa métodos de pagamento.' },
     { q: 'Posso cancelar um pedido?', a: 'O cancelamento depende das regras do backend e do estado do pedido. Fala com o suporte a partir do acompanhamento do pedido.' },
-    { q: 'Como funciona o Enviar?', a: 'Escolhe o tipo de item e indica recolha e destino. A criação de envios ainda aguarda a RPC do backend; o acompanhamento de envios existentes já está ligado.' },
+    { q: 'Como funciona o Enviar?', a: 'Escolhe o tipo de item e indica recolha e destino. O Enviar cria envios através do backend e permite acompanhar envios quando existe um ID válido.' },
     { q: 'Como uso códigos promocionais?', a: 'O backend não expõe promoções para clientes nesta versão, por isso não há códigos activos na app.' },
   ];
 
