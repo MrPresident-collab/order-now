@@ -4,13 +4,15 @@ import { listActiveBusinesses, type CatalogBusiness } from '@/repositories/catal
 import { BottomNav } from '@/components/BottomNav';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LoadingView, ErrorView, EmptyView, BackendBlockedView } from '@/components/StateViews';
-import { Search, UtensilsCrossed, ShoppingBag, Store } from 'lucide-react';
+import { Search, UtensilsCrossed, ShoppingBag, Store, X } from 'lucide-react';
 
 const shortcuts = [
-  { id: 'comida' as const, label: 'Comida', icon: UtensilsCrossed, description: 'Restaurantes e comida local' },
-  { id: 'compras' as const, label: 'Compras', icon: ShoppingBag, description: 'Compras do dia a dia' },
-  { id: 'lojas' as const, label: 'Lojas', icon: Store, description: 'Supermercados e grandes lojas' },
+  { id: 'comida' as const, label: 'Comida', icon: UtensilsCrossed },
+  { id: 'compras' as const, label: 'Compras', icon: ShoppingBag },
+  { id: 'lojas' as const, label: 'Lojas', icon: Store },
 ];
+
+const categoryLabel = (value: string | null) => value === 'comida' ? 'Comida' : value === 'compras' ? 'Compras' : value === 'lojas' ? 'Lojas' : 'Pedejá';
 
 export function Discover() {
   const { navigate, setSelectedRestaurantId } = useNav();
@@ -22,124 +24,53 @@ export function Discover() {
   const load = () => {
     setLoading(true);
     setError(null);
-    listActiveBusinesses()
-      .then(setBusinesses)
-      .catch((err: Error) => setError(err.message))
-      .finally(() => setLoading(false));
+    listActiveBusinesses().then(setBusinesses).catch((err: Error) => setError(err.message)).finally(() => setLoading(false));
   };
-
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return businesses;
-    return businesses.filter((business) => {
-      const haystack = (business.name + ' ' + (business.description ?? '')).toLowerCase();
-      return haystack.includes(q);
-    });
+    return q ? businesses.filter((business) => (business.name + ' ' + (business.description ?? '')).toLowerCase().includes(q)) : businesses;
   }, [businesses, query]);
 
   const blocked = error?.includes('permission denied') || error?.includes('42501');
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-24">
-      <header className="bg-white dark:bg-gray-900 px-5 pt-12 pb-4 safe-top sticky top-0 z-30 border-b border-gray-100 dark:border-gray-800">
+    <div className="min-h-screen bg-[#F8F7FA] dark:bg-[#0B0B0D] pb-24">
+      <header className="bg-[#F8F7FA]/95 dark:bg-[#0B0B0D]/95 backdrop-blur-md px-5 pt-10 pb-4 safe-top sticky top-0 z-30">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">Descobrir</h1>
+          <div><p className="text-xs font-bold tracking-[0.16em] uppercase text-[#8A2BE2]">Pedejá</p><h1 className="text-2xl font-extrabold text-gray-950 dark:text-white mt-0.5">Descobrir</h1></div>
           <ThemeToggle />
         </div>
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Procurar negócio"
-            className="w-full bg-gray-100 dark:bg-gray-800 rounded-xl pl-11 pr-4 py-3 text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-pedeja-600/30"
-          />
+          <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="O que procuras?" className="w-full bg-white dark:bg-[#1A1A1A] border border-black/[0.04] dark:border-white/[0.05] rounded-2xl pl-11 pr-11 py-3.5 text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-[#8A2BE2]/30" />
+          {query && <button onClick={() => setQuery('')} aria-label="Limpar pesquisa" className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center"><X className="w-4 h-4 text-gray-500" /></button>}
         </div>
       </header>
 
-      <main className="px-5 pt-5 space-y-7">
-        <section>
-          <h2 className="text-base font-extrabold text-gray-900 dark:text-white mb-3">Explorar por categoria</h2>
-          <div className="space-y-2">
-            {shortcuts.map(({ id, label, icon: Icon, description }) => (
-              <button
-                key={id}
-                onClick={() => navigate(id)}
-                className="w-full flex items-center gap-4 bg-white dark:bg-gray-900 p-4 rounded-2xl text-left shadow-sm active:scale-[0.98] transition-transform"
-              >
-                <span className="w-11 h-11 rounded-xl bg-pedeja-600/10 text-pedeja-600 flex items-center justify-center shrink-0">
-                  <Icon className="w-5 h-5" />
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-sm font-bold text-gray-900 dark:text-white">{label}</span>
-                  <span className="block text-xs text-gray-500 dark:text-gray-400 mt-0.5">{description}</span>
-                </span>
-              </button>
-            ))}
-          </div>
-        </section>
+      <main className="px-5 pt-4">
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 -mx-5 px-5">
+          {shortcuts.map(({ id, label, icon: Icon }) => <button key={id} onClick={() => navigate(id)} className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full bg-white dark:bg-[#1A1A1A] border border-black/[0.04] dark:border-white/[0.05] text-sm font-bold text-gray-700 dark:text-gray-200 active:scale-95 transition-transform"><Icon className="w-4 h-4 text-[#8A2BE2]" />{label}</button>)}
+        </div>
 
-        <section>
-          <h2 className="text-base font-extrabold text-gray-900 dark:text-white mb-1">
-            {query.trim() ? 'Resultados' : 'Negócios disponíveis'}
-          </h2>
-          {!loading && !error && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-              {filtered.length} {filtered.length === 1 ? 'negócio' : 'negócios'}
-            </p>
-          )}
-
+        <section className="mt-6">
+          <div className="mb-3"><h2 className="text-base font-extrabold text-gray-950 dark:text-white">{query.trim() ? 'Resultados' : 'Explorar negócios'}</h2>{!loading && !error && <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{filtered.length} {filtered.length === 1 ? 'negócio' : 'negócios'}</p>}</div>
           {loading && <LoadingView message="A carregar negócios..." />}
-          {error && blocked && (
-            <BackendBlockedView message="O catálogo não está disponível para esta sessão. Verifica o acesso autenticado e as políticas RLS." />
-          )}
-          {error && !blocked && (
-            <ErrorView message={'Não foi possível carregar os negócios. ' + error} onRetry={load} />
-          )}
-
+          {error && blocked && <BackendBlockedView message="O catálogo não está disponível para esta sessão. Verifica o acesso autenticado e as políticas RLS." />}
+          {error && !blocked && <ErrorView message={'Não foi possível carregar os negócios. ' + error} onRetry={load} />}
           {!loading && !error && filtered.length > 0 && (
             <div className="space-y-2">
-              {filtered.map((business) => (
-                <button
-                  key={business.id}
-                  onClick={() => {
-                    setSelectedRestaurantId(business.id);
-                    navigate('restaurant');
-                  }}
-                  className="w-full bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm text-left active:scale-[0.98] transition-transform"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <h3 className="font-bold text-sm text-gray-900 dark:text-white truncate">{business.name}</h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
-                        {business.description || 'Negócio parceiro Pedejá'}
-                      </p>
-                    </div>
-                    {business.marketplace_category && (
-                      <span className="shrink-0 text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-1 rounded-full">
-                        {business.marketplace_category}
-                      </span>
-                    )}
-                  </div>
-                </button>
-              ))}
+              {filtered.map((business) => <button key={business.id} onClick={() => { setSelectedRestaurantId(business.id); navigate('restaurant'); }} className="w-full flex items-center gap-3.5 bg-white dark:bg-[#1A1A1A] rounded-2xl p-3.5 border border-black/[0.04] dark:border-white/[0.05] text-left active:scale-[0.985] transition-transform">
+                <div className="w-14 h-14 rounded-xl bg-[#8A2BE2]/10 flex items-center justify-center shrink-0"><span className="text-xl font-extrabold text-[#8A2BE2]">{business.name.charAt(0).toUpperCase()}</span></div>
+                <div className="min-w-0 flex-1"><h3 className="font-bold text-sm text-gray-950 dark:text-white truncate">{business.name}</h3><p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">{business.description || categoryLabel(business.marketplace_category)}</p></div>
+                <span className="shrink-0 text-[10px] font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500">{categoryLabel(business.marketplace_category)}</span>
+              </button>)}
             </div>
           )}
-
-          {!loading && !error && filtered.length === 0 && (
-            <EmptyView
-              title={query.trim() ? 'Nenhum negócio encontrado' : 'Nenhum negócio disponível'}
-              hint={query.trim() ? 'Tenta procurar por outro nome.' : 'Ainda não há negócios publicados.'}
-            />
-          )}
+          {!loading && !error && filtered.length === 0 && <EmptyView title={query.trim() ? 'Nenhum negócio encontrado' : 'Nenhum negócio disponível'} hint={query.trim() ? 'Tenta procurar por outro nome.' : 'Ainda não há negócios publicados.'} />}
         </section>
       </main>
-
       <BottomNav current="discover" />
     </div>
   );
