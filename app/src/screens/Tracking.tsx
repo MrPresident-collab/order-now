@@ -3,7 +3,7 @@ import { useNav } from '@/nav';
 import { useAuth } from '@/auth';
 import { getCustomerOrderDetail, subscribeToOrder } from '@/repositories/orderDetail';
 import type { CustomerOrderDetail } from '@/repositories/orderDetail';
-import { ChevronLeft, Phone, MessageCircle, MapPin, Bike, Star, Share2 } from 'lucide-react';
+import { ChevronLeft, Phone, MessageCircle, MapPin, Bike, Share2 } from 'lucide-react';
 import { LoadingView, ErrorView, EmptyView } from '@/components/StateViews';
 
 export function Tracking() {
@@ -96,7 +96,7 @@ export function Tracking() {
                   <Bike className="w-6 h-6 text-pedeja-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{detail.delivery?.status ?? detail.status}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{{ DELIVERED: 'Entregue', ACCEPTED: 'Aceite', PREPARING: 'A preparar', READY: 'Pronto', PICKED_UP: 'Recolhido', IN_TRANSIT: 'A caminho' } as Record<string, string>)[(detail.delivery?.status ?? detail.status).toUpperCase()] ?? 'Em processamento'}</p>
                   <p className="text-xl font-extrabold text-gray-900 dark:text-white">{detail.businessName}</p>
                 </div>
               </div>
@@ -118,12 +118,9 @@ export function Tracking() {
               </div>
               <div className="flex-1">
                 <p className="font-bold text-gray-900 dark:text-white text-sm">{detail.delivery?.riderName ?? 'Estafeta Pedejá'}</p>
-                <div className="flex items-center gap-1">
-                  <Star className="w-3.5 h-3.5 text-accent-500 fill-accent-500" />
-                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                    {[detail.delivery?.vehicleMake, detail.delivery?.vehicleModel, detail.delivery?.vehicleRegistration].filter(Boolean).join(' ') || 'Entrega Pedejá'}
-                  </span>
-                </div>
+                <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  {[detail.delivery?.vehicleMake, detail.delivery?.vehicleModel, detail.delivery?.vehicleRegistration].filter(Boolean).join(' ') || 'Entrega Pedejá'}
+                </p>
               </div>
               <button onClick={callRider} disabled={!riderPhone} aria-label="Ligar ao estafeta" className="w-10 h-10 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center disabled:opacity-40"><Phone className="w-5 h-5 text-pedeja-600" /></button>
               <button onClick={messageRider} disabled={!riderPhone} aria-label="Enviar mensagem ao estafeta" className="w-10 h-10 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center disabled:opacity-40"><MessageCircle className="w-5 h-5 text-pedeja-600" /></button>
