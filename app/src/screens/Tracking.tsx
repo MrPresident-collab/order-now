@@ -96,7 +96,7 @@ export function Tracking() {
                   <Bike className="w-6 h-6 text-pedeja-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{{ DELIVERED: 'Entregue', ACCEPTED: 'Aceite', PREPARING: 'A preparar', READY: 'Pronto', PICKED_UP: 'Recolhido', IN_TRANSIT: 'A caminho' } as Record<string, string>)[(detail.delivery?.status ?? detail.status).toUpperCase()] ?? 'Em processamento'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{({ DELIVERED: 'Entregue', ACCEPTED: 'Aceite', PREPARING: 'A preparar', READY: 'Pronto', PICKED_UP: 'Recolhido', IN_TRANSIT: 'A caminho' } as Record<string, string>)[(detail.delivery?.status ?? detail.status).toUpperCase()] ?? 'Em processamento'}</p>
                   <p className="text-xl font-extrabold text-gray-900 dark:text-white">{detail.businessName}</p>
                 </div>
               </div>
