@@ -67,7 +67,7 @@ export function Lojas() {
         ))}
         {!loading && !error && filtered.length === 0 && <EmptyView title="Sem lojas" hint="Ainda não há lojas publicadas." />}
       </div>
-      <BottomNav current="comida" />
+      <BottomNav current="discover" />
     </div>
   );
 }
