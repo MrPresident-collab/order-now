@@ -9,7 +9,6 @@ export function About() {
   const links = [
     { icon: FileText, label: 'Termos de serviço' },
     { icon: Shield, label: 'Política de privacidade' },
-    { icon: FileText, label: 'Termos de uso' },
     { icon: Shield, label: 'Cookies' },
   ];
 
