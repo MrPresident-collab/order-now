@@ -100,7 +100,7 @@ export function Home() {
             <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-5 px-5 pb-1 snap-x">
               {businesses.slice(0, 8).map((business) => (
                 <button key={business.id} onClick={() => { setSelectedRestaurantId(business.id); navigate('restaurant'); }} className="w-[220px] shrink-0 snap-start text-left bg-white dark:bg-[#1A1A1A] rounded-2xl p-4 border border-black/[0.04] dark:border-white/[0.05] active:scale-[0.98] transition-transform">
-                  <div className="w-full h-24 rounded-xl bg-gradient-to-br from-[#8A2BE2]/15 to-[#8A2BE2]/5 flex items-center justify-center mb-3"><span className="text-2xl font-extrabold text-[#8A2BE2]">{business.name.charAt(0).toUpperCase()}</span></div>
+                  <div className="w-full h-24 rounded-xl bg-[#8A2BE2]/10 flex items-center justify-center mb-3"><span className="text-2xl font-extrabold text-[#8A2BE2]">{business.name.charAt(0).toUpperCase()}</span></div>
                   <h3 className="font-bold text-sm text-gray-950 dark:text-white truncate">{business.name}</h3>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">{business.description || categoryLabel(business.marketplace_category)}</p>
                 </button>
