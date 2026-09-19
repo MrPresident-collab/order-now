@@ -55,7 +55,7 @@ export function OrderDetail() {
             <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm">
               <p className="text-xs text-gray-400">Referência</p>
               <p className="font-extrabold">{detail.orderReference}</p>
-              <p className="mt-1 text-sm">{detail.businessName} · {detail.status}</p>
+              <p className="mt-1 text-sm">{detail.businessName} · {({ DELIVERED: 'Entregue', CANCELLED: 'Cancelado', ACCEPTED: 'Aceite', PREPARING: 'A preparar', READY: 'Pronto', PICKED_UP: 'Recolhido', IN_TRANSIT: 'A caminho' } as Record<string, string>)[detail.status.toUpperCase()] ?? 'Em processamento'}</p>
               <p className="text-xs text-gray-500 mt-1">Pagamento: {detail.paymentStatus}{detail.paymentMethod ? ` · ${detail.paymentMethod}` : ''}</p>
             </div>
             <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm">
