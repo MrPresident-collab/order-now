@@ -60,7 +60,7 @@ export function Enviar() {
     if (!user) return setCreateError('Entra na conta para criar um envio.');
     if (!pickupAddress) return setCreateError('Adiciona uma morada de recolha antes de continuar.');
     if (!recipientName.trim() || recipientName.trim().length < 2) return setCreateError('Indica o nome de quem vai receber.');
-    if (recipientPhone.replace(/\\D/g, '').length < 9) return setCreateError('Indica um telefone válido para o destinatário.');
+    if (recipientPhone.replace(/\D/g, '').length < 9) return setCreateError('Indica um telefone válido para o destinatário.');
     if (!destination.trim() || destination.trim().length < 2) return setCreateError('Indica a morada de destino.');
     if (!packageDescription.trim()) return setCreateError('Descreve brevemente o que vais enviar.');
     setCreating(true);
