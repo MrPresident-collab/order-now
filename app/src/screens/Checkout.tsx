@@ -186,10 +186,10 @@ export function Checkout() {
             <span className="text-pedeja-600 font-extrabold text-xs">Kz</span>
           </div>
           <div className="flex-1">
-            <p className="font-bold text-gray-900 dark:text-white text-sm">Dinheiro</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Método disponível no fluxo actual.</p>
+            <p className="font-bold text-gray-900 dark:text-white text-sm">Pagamento</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">O método de pagamento será definido pelo fluxo de pagamento disponível.</p>
           </div>
-          <Check className="w-5 h-5 text-pedeja-600" />
+          <span className="text-[11px] font-semibold text-gray-400">Backend</span>
         </div>
       </div>
 
